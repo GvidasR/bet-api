@@ -4,6 +4,19 @@
 # Put parameters here that don't need to change on each machine where the app is deployed
 # https://symfony.com/doc/current/best_practices/configuration.html#application-related-configuration
 parameters:
+    bet:
+        stake_amount:
+            min: 0.3
+            max: 10000
+        selections:
+            min_count: 1
+            max_count: 20
+            min_odds: 1
+            max_odds: 10000
+        max_win: 20000
+    player:
+        initial_balance: 1000
+    lock_duration: 300
 
 services:
     # default configuration for services in *this* file
