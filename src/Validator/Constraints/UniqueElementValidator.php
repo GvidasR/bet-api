@@ -5,11 +5,13 @@ namespace App\Validator\Constraints;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 
-class UniqueElementsValidator extends ConstraintValidator
+class UniqueElementValidator extends ConstraintValidator
 {
     public function validate($value, Constraint $constraint)
     {
-        if(count(array_unique(array_column($value,$constraint->field))) < count($value)){
+        $bet = $this->context->getRoot();
+        $idCounts = array_count_values(array_column($bet['selections'],$constraint->field));
+        if($idCounts[$value] > 1){
             $this->context->addViolation($constraint->message);
         }
     }

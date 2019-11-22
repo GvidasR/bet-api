@@ -7,7 +7,7 @@ use Symfony\Component\Validator\Constraint;
 /**
  * @Annotation
  */
-class UniqueElements extends Constraint
+class UniqueElement extends Constraint
 {
     public $field = '';
     public $message = '';

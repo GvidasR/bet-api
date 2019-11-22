@@ -38,7 +38,7 @@ class BetValidator
         $countable = is_array($violations) || $violations instanceof \Countable;
         if ($countable && count($violations) !== 0) {
             foreach($violations as $violation) {
-                if(strpos($violation->getPropertyPath(),'selections][') >0) {
+                if(strpos($violation->getPropertyPath(),'selections][') >0 && !($violation->getConstraint()->payload instanceof BetslipStructureMismatch)) {
                     preg_match_all('/\[selections\]\[(\d+)\]/m',$violation->getPropertyPath(),$index);
                     $index = $index[1][0];
                     if(!array_key_exists('errors',$bet['selections'][$index])) {
@@ -52,7 +52,9 @@ class BetValidator
                     $bet['errors'][]  = $violation->getConstraint()->payload;
                 }
             }
-            $bet['errors'] = array_unique($bet['errors']);
+            if(!empty($bet['errors'])) {
+                $bet['errors'] = array_unique($bet['errors']);
+            }
             return false;
         }
         return true;
@@ -77,12 +79,12 @@ class BetValidator
                 new Assert\Type(['type' => 'array', 'payload' => new BetslipStructureMismatch()]),
                 new Assert\Count(['min' => $this->betParameters['selections']['min_count'], 'payload' => new MinimumNumberOfSelections($this->betParameters['selections']['min_count'])]),
                 new Assert\Count(['max' => $this->betParameters['selections']['max_count'], 'payload' => new MaximumNumberOfSelections($this->betParameters['selections']['max_count'])]),
-                new AppAssert\UniqueElements(['field' => 'id', 'payload' => new DuplicateSelectionFound()]),
                 new Assert\All([
                     new Assert\Collection([
                         'id' => new Assert\Optional([
                             new Assert\NotNull(['payload' => new BetslipStructureMismatch()]),
                             new Assert\Type(['type' => 'integer', 'payload' => new BetslipStructureMismatch()]),
+                            new AppAssert\UniqueElement(['field' => 'id', 'payload' => new DuplicateSelectionFound()])
                         ]),
                         'odds' => new Assert\Optional([
                             new Assert\NotNull(['message' => new BetslipStructureMismatch()]),
